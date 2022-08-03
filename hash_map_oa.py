@@ -159,37 +159,59 @@ class HashMap:
         if (self._is_prime(new_capacity) == False):
             new_capacity = self._next_prime(new_capacity)
 
-        # Make new bucket array with new_capacity size
-        new_buckets = DynamicArray()
-        for _ in range(new_capacity):
-            new_buckets.append(None)
+        # Make new HashMap
+        new_map = HashMap(new_capacity, self._hash_function)
 
-        # remember to rehash non-deleted entries into new table
+        # Rehash using put method
         for i in range(self._capacity):
             if (self._buckets[i] == None):
-                # Keep moving
+                # Move along
                 continue
             elif (self._buckets[i].is_tombstone == True):
-                # Keep moving
+                # Move along
                 continue
             else:
-                # Add item to new array
-                new_entry = HashEntry(self._buckets[i].key, self._buckets[i].value)
-                init_idx = self._hash_function(self._buckets[i].key) % new_capacity
-                j = 0
-                added = False
-                while (added == False):
-                    cur_idx = (init_idx + (j ** 2)) % new_capacity
-                    if (new_buckets[cur_idx] == None):
-                        # No item at index. Add new item.
-                        new_buckets[cur_idx] = new_entry
-                        added = True
-                    else:
-                        # Different item occupying index. Continue quadratic probing.
-                        j += 1
+                # Add element to new_map
+                key = self._buckets[i].key
+                value = self._buckets[i].value
+                new_map.put(key, value)
 
-        self._buckets = new_buckets
-        self._capacity = new_capacity
+        # Update info to equal new_map info
+        self._buckets = new_map._buckets
+        self._capacity = new_map._capacity
+        self._size = new_map._size
+
+        # # Make new bucket array with new_capacity size
+        # new_buckets = DynamicArray()
+        # for _ in range(new_capacity):
+        #     new_buckets.append(None)
+
+        # # remember to rehash non-deleted entries into new table
+        # for i in range(self._capacity):
+        #     if (self._buckets[i] == None):
+        #         # Keep moving
+        #         continue
+        #     elif (self._buckets[i].is_tombstone == True):
+        #         # Keep moving
+        #         continue
+        #     else:
+        #         # Add item to new array
+        #         new_entry = HashEntry(self._buckets[i].key, self._buckets[i].value)
+        #         init_idx = self._hash_function(self._buckets[i].key) % new_capacity
+        #         j = 0
+        #         added = False
+        #         while (added == False):
+        #             cur_idx = (init_idx + (j ** 2)) % new_capacity
+        #             if (new_buckets[cur_idx] == None):
+        #                 # No item at index. Add new item.
+        #                 new_buckets[cur_idx] = new_entry
+        #                 added = True
+        #             else:
+        #                 # Different item occupying index. Continue quadratic probing.
+        #                 j += 1
+
+        # self._buckets = new_buckets
+        # self._capacity = new_capacity
 
         # # Check the load factor and do it all again if >= 0.5
         # if (self.table_load() >= 0.5):
